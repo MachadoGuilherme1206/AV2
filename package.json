@@ -1,0 +1,27 @@
+{
+  "name": "greencode",
+  "version": "1.0.0",
+  "description": "Sistema de gestao de logistica reversa de residuos eletronicos",
+  "main": "out/main.js",
+  "scripts": {
+    "compilar": "tsc",
+    "iniciar": "node out/main.js",
+    "dev": "tsc && node out/main.js",
+    "testar": "tsc && node --test \"out/testes/unitarios/*.test.js\"",
+    "limpar": "node scripts/limpar.js"
+  },
+  "keywords": [
+    "logistica-reversa",
+    "residuos-eletronicos",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

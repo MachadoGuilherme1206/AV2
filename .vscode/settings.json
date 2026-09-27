@@ -1,0 +1,12 @@
+{
+  // Usa o TypeScript instalado no projeto (5.9.3) em vez da versao embutida
+  // no editor. Sem isto, o editor pode acusar erros que o compilador do
+  // projeto nao acusa - por exemplo, nao reconhecer os modulos nativos do
+  // Node escritos como 'node:fs'.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "editor.insertSpaces": true,
+  "editor.tabSize": 4,
+  "files.eol": "\n",
+  "files.encoding": "utf8"
+}

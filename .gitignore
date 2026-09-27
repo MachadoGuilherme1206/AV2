@@ -1,0 +1,27 @@
+# Dependencias
+node_modules/
+
+# Codigo compilado
+out/
+
+# DADOS E CHAVES - nunca versionar
+# A chave mestra e os arquivos cifrados sao gerados na maquina de cada usuario.
+# Commitar qualquer coisa daqui anula toda a arquitetura de seguranca do sistema.
+config/
+data/
+logs/
+*.key
+*.enc
+
+# Sistema operacional
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editores
+# .vscode/settings.json e versionado de proposito: ele aponta o editor para o
+# TypeScript do projeto, o que evita erros falsos em quem clonar o repositorio.
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
