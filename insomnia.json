@@ -1,0 +1,802 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-10-22T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_greencode",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "greencode",
+      "description": "Rotas da API do greencode (AV2). Rode npm run dev antes de testar.",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_greencode",
+      "_type": "environment",
+      "parentId": "wrk_greencode",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "token_admin": "{% response 'body', 'req_login_admin', 'b64::JC50b2tlbg==::46b', 'when-expired', 1500 %}",
+        "token_operador": "{% response 'body', 'req_login_operador', 'b64::JC50b2tlbg==::46b', 'when-expired', 1500 %}",
+        "token_gestor": "{% response 'body', 'req_login_gestor', 'b64::JC50b2tlbg==::46b', 'when-expired', 1500 %}",
+        "token_auditor": "{% response 'body', 'req_login_auditor', 'b64::JC50b2tlbg==::46b', 'when-expired', 1500 %}"
+      }
+    },
+    {
+      "_id": "fld_1",
+      "_type": "request_group",
+      "parentId": "wrk_greencode",
+      "name": "1 - Autenticacao",
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_login_admin",
+      "_type": "request",
+      "parentId": "fld_1",
+      "name": "Login admin",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"login\": \"admin\",\n  \"senha\": \"viuvanegra\"\n}"
+      },
+      "authentication": {},
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_login_operador",
+      "_type": "request",
+      "parentId": "fld_1",
+      "name": "Login operador",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"login\": \"operador\",\n  \"senha\": \"operador123\"\n}"
+      },
+      "authentication": {},
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_login_gestor",
+      "_type": "request",
+      "parentId": "fld_1",
+      "name": "Login gestor",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"login\": \"gestor\",\n  \"senha\": \"gestor123\"\n}"
+      },
+      "authentication": {},
+      "metaSortKey": 3
+    },
+    {
+      "_id": "req_login_auditor",
+      "_type": "request",
+      "parentId": "fld_1",
+      "name": "Login auditor",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"login\": \"auditor\",\n  \"senha\": \"auditor123\"\n}"
+      },
+      "authentication": {},
+      "metaSortKey": 4
+    },
+    {
+      "_id": "req_1",
+      "_type": "request",
+      "parentId": "fld_1",
+      "name": "Login com senha errada (401)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"login\": \"admin\",\n  \"senha\": \"errada\"\n}"
+      },
+      "authentication": {},
+      "metaSortKey": 5
+    },
+    {
+      "_id": "fld_2",
+      "_type": "request_group",
+      "parentId": "wrk_greencode",
+      "name": "2 - Usuarios (admin)",
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_2",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "Listar usuarios",
+      "method": "GET",
+      "url": "{{ _.base_url }}/usuarios",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_admin }}"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_3",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "Criar usuario",
+      "method": "POST",
+      "url": "{{ _.base_url }}/usuarios",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"login\": \"joao\",\n  \"senha\": \"123456\",\n  \"papel\": \"AUDITOR\"\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_admin }}"
+      },
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_4",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "Desativar usuario 5 (rode o Criar antes)",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/usuarios/5/desativar",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"versao\": 1\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_admin }}"
+      },
+      "metaSortKey": 3
+    },
+    {
+      "_id": "req_5",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "Auditor tenta listar usuarios (403)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/usuarios",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 4
+    },
+    {
+      "_id": "fld_3",
+      "_type": "request_group",
+      "parentId": "wrk_greencode",
+      "name": "3 - Organizacoes (operador)",
+      "metaSortKey": 3
+    },
+    {
+      "_id": "req_6",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "Listar organizacoes",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizacoes",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_7",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "Detalhe da organizacao 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizacoes/1",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_8",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "Criar organizacao",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizacoes",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"razaoSocial\": \"Universidade Gama\",\n  \"nomeFantasia\": \"Gama\",\n  \"cnpj\": \"24.681.357/0001-40\",\n  \"logradouro\": \"Rua A\",\n  \"numero\": \"10\",\n  \"bairro\": \"Centro\",\n  \"cidade\": \"Jacarei\",\n  \"uf\": \"SP\",\n  \"cep\": \"12300-000\"\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_operador }}"
+      },
+      "metaSortKey": 3
+    },
+    {
+      "_id": "req_9",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "Criar com CNPJ invalido (400)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizacoes",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"razaoSocial\": \"Empresa X\",\n  \"nomeFantasia\": \"X\",\n  \"cnpj\": \"11.222.333/0001-82\",\n  \"logradouro\": \"Rua B\",\n  \"numero\": \"1\",\n  \"bairro\": \"Centro\",\n  \"cidade\": \"Jacarei\",\n  \"uf\": \"SP\",\n  \"cep\": \"12300-000\"\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_operador }}"
+      },
+      "metaSortKey": 4
+    },
+    {
+      "_id": "req_10",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "Criar contrato da organizacao 3",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/organizacoes/3/contrato",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"numero\": \"CT-2026-010\",\n  \"dataInicio\": \"2026-10-01\",\n  \"dataFim\": \"2027-10-01\",\n  \"periodicidadeDias\": 15\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_operador }}"
+      },
+      "metaSortKey": 5
+    },
+    {
+      "_id": "req_11",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "Atualizar contrato da organizacao 3 (versao 1)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/organizacoes/3/contrato",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"numero\": \"CT-2026-010\",\n  \"dataInicio\": \"2026-10-01\",\n  \"dataFim\": \"2027-12-01\",\n  \"periodicidadeDias\": 30,\n  \"versao\": 1\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_operador }}"
+      },
+      "metaSortKey": 6
+    },
+    {
+      "_id": "req_12",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "Gestor tenta criar organizacao (403)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizacoes",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 7
+    },
+    {
+      "_id": "fld_4",
+      "_type": "request_group",
+      "parentId": "wrk_greencode",
+      "name": "4 - Lotes (gestor)",
+      "metaSortKey": 4
+    },
+    {
+      "_id": "req_13",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "Listar lotes",
+      "method": "GET",
+      "url": "{{ _.base_url }}/lotes",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_14",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "Detalhe do lote 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/lotes/1",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_15",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "Criar lote com equipamentos (data de hoje)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/lotes",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"organizacaoId\": 1,\n  \"notaFiscal\": \"777\",\n  \"transportadora\": \"TransRapida\",\n  \"dataEntrada\": \"{% now 'custom', 'YYYY-MM-DD' %}\",\n  \"equipamentos\": [\n    {\n      \"tipo\": \"COMPUTADOR\",\n      \"marca\": \"Dell\",\n      \"modelo\": \"Vostro 3710\",\n      \"valor\": 3000\n    },\n    {\n      \"tipo\": \"MONITOR\",\n      \"marca\": \"AOC\",\n      \"modelo\": \"24B2\",\n      \"valor\": 700\n    }\n  ]\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 3
+    },
+    {
+      "_id": "req_16",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "Criar lote com data futura (400)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/lotes",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"organizacaoId\": 1,\n  \"notaFiscal\": \"778\",\n  \"transportadora\": \"TransRapida\",\n  \"dataEntrada\": \"2030-01-01\"\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 4
+    },
+    {
+      "_id": "req_17",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "Adicionar equipamento ao lote 1",
+      "method": "POST",
+      "url": "{{ _.base_url }}/lotes/1/equipamentos",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"tipo\": \"PERIFERICO\",\n  \"marca\": \"HP\",\n  \"modelo\": \"Mouse X200\",\n  \"valor\": 50\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 5
+    },
+    {
+      "_id": "fld_5",
+      "_type": "request_group",
+      "parentId": "wrk_greencode",
+      "name": "5 - Equipamentos (gestor)",
+      "metaSortKey": 5
+    },
+    {
+      "_id": "req_18",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Listar equipamentos",
+      "method": "GET",
+      "url": "{{ _.base_url }}/equipamentos",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_19",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Listar so os RECEBIDOS",
+      "method": "GET",
+      "url": "{{ _.base_url }}/equipamentos?status=RECEBIDO",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_20",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Detalhe do equipamento 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/equipamentos/1",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 3
+    },
+    {
+      "_id": "req_21",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Desmonte sem triagem (400)",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/equipamentos/1/status",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"para\": \"DESMONTE\",\n  \"versao\": 1\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 4
+    },
+    {
+      "_id": "req_22",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Triagem do equipamento 1",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/equipamentos/1/triagem",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"estado\": \"NOVO\",\n  \"versao\": 1\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 5
+    },
+    {
+      "_id": "req_23",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Estado cai 2 niveis sem justificativa (400)",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/equipamentos/1/estado",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"estado\": \"REGULAR\",\n  \"versao\": 2\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 6
+    },
+    {
+      "_id": "req_24",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Estado cai 2 niveis com justificativa",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/equipamentos/1/estado",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"estado\": \"REGULAR\",\n  \"justificativa\": \"tela trincada e carcaca quebrada\",\n  \"versao\": 2\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 7
+    },
+    {
+      "_id": "req_25",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Mover para DESMONTE",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/equipamentos/1/status",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"para\": \"DESMONTE\",\n  \"versao\": 3\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 8
+    },
+    {
+      "_id": "req_26",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Mover para RECICLADO",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/equipamentos/1/status",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"para\": \"RECICLADO\",\n  \"versao\": 4\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 9
+    },
+    {
+      "_id": "req_27",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "Versao desatualizada (409)",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/equipamentos/2/status",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"para\": \"DESMONTE\",\n  \"versao\": 99\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_gestor }}"
+      },
+      "metaSortKey": 10
+    },
+    {
+      "_id": "fld_6",
+      "_type": "request_group",
+      "parentId": "wrk_greencode",
+      "name": "6 - Relatorios (auditor)",
+      "metaSortKey": 6
+    },
+    {
+      "_id": "req_28",
+      "_type": "request",
+      "parentId": "fld_6",
+      "name": "Rastreio do GC-COMP-0001",
+      "method": "GET",
+      "url": "{{ _.base_url }}/relatorios/rastreio/GC-COMP-0001",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_29",
+      "_type": "request",
+      "parentId": "fld_6",
+      "name": "Rastreio do GC-COMP-0003 (com depreciacao)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/relatorios/rastreio/GC-COMP-0003",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_30",
+      "_type": "request",
+      "parentId": "fld_6",
+      "name": "Resumo da organizacao 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/relatorios/organizacoes/1",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 3
+    },
+    {
+      "_id": "fld_7",
+      "_type": "request_group",
+      "parentId": "wrk_greencode",
+      "name": "7 - Configuracoes (admin)",
+      "metaSortKey": 7
+    },
+    {
+      "_id": "req_31",
+      "_type": "request",
+      "parentId": "fld_7",
+      "name": "Ver parametros",
+      "method": "GET",
+      "url": "{{ _.base_url }}/configuracoes",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_admin }}"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_32",
+      "_type": "request",
+      "parentId": "fld_7",
+      "name": "Alterar depreciacao mensal",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/configuracoes/depreciacao.mensal",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"valor\": 3\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_admin }}"
+      },
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_33",
+      "_type": "request",
+      "parentId": "fld_7",
+      "name": "Auditor tenta ver parametros (403)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/configuracoes",
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_auditor }}"
+      },
+      "metaSortKey": 3
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+enum StatusEquipamento {
+  RECEBIDO
+  TRIADO
+  DESMONTE
+  RECICLADO
+  DESCARTADO
+}

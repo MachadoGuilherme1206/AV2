@@ -1,0 +1,4 @@
+model Configuracao {
+  chave String @id
+  valor String
+}

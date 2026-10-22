@@ -1,0 +1,12 @@
+model Lote {
+  id             Int      @id @default(autoincrement())
+  notaFiscal     String
+  transportadora String
+  dataEntrada    DateTime @db.Date
+  versao         Int      @default(1)
+
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id])
+  organizacaoId Int
+
+  equipamentos Equipamento[]
+}

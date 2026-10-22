@@ -4,14 +4,8 @@ node_modules/
 # Codigo compilado
 out/
 
-# DADOS E CHAVES - nunca versionar
-# A chave mestra e os arquivos cifrados sao gerados na maquina de cada usuario.
-# Commitar qualquer coisa daqui anula toda a arquitetura de seguranca do sistema.
-config/
-data/
-logs/
-*.key
-*.enc
+# Variaveis de ambiente locais (o modelo versionado e o .env.example)
+.env
 
 # Sistema operacional
 Thumbs.db

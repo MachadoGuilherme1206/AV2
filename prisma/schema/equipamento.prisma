@@ -1,0 +1,16 @@
+model Equipamento {
+  id                  Int               @id @default(autoincrement())
+  codigoBarrasInterno String            @unique
+  tipo                TipoEquipamento
+  marca               String
+  modelo              String
+  valor               Decimal           @db.Decimal(10, 2)
+  estado              EstadoFisico?
+  status              StatusEquipamento @default(RECEBIDO)
+  versao              Int               @default(1)
+
+  lote   Lote @relation(fields: [loteId], references: [id])
+  loteId Int
+
+  movimentacoes Movimentacao[]
+}

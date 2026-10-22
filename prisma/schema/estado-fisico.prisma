@@ -1,0 +1,7 @@
+enum EstadoFisico {
+  SUCATA
+  RUIM
+  REGULAR
+  BOM
+  NOVO
+}

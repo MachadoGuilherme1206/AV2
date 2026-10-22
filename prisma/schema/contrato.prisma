@@ -1,0 +1,11 @@
+model Contrato {
+  id                Int      @id @default(autoincrement())
+  numero            String   @unique
+  dataInicio        DateTime @db.Date
+  dataFim           DateTime @db.Date
+  periodicidadeDias Int
+  versao            Int      @default(1)
+
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id])
+  organizacaoId Int         @unique
+}

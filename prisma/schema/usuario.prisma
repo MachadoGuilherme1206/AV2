@@ -1,0 +1,10 @@
+model Usuario {
+  id        Int     @id @default(autoincrement())
+  login     String  @unique
+  senhaHash String
+  papel     Papel
+  ativo     Boolean @default(true)
+  versao    Int     @default(1)
+
+  movimentacoes Movimentacao[]
+}

@@ -1,0 +1,16 @@
+model Organizacao {
+  id           Int    @id @default(autoincrement())
+  razaoSocial  String
+  nomeFantasia String
+  cnpj         String @unique
+  logradouro   String
+  numero       String
+  bairro       String
+  cidade       String
+  uf           String
+  cep          String
+  versao       Int    @default(1)
+
+  contrato Contrato?
+  lotes    Lote[]
+}

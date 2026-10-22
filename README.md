@@ -1,249 +1,135 @@
 # greencode
 
-Sistema de linha de comando para gestão de logística reversa de resíduos
-eletrônicos, desenvolvido em Node.js com TypeScript.
+API REST para gestão de logística reversa de resíduos eletrônicos (AV2).
+Na AV1 o greencode era uma CLI que salvava em arquivos criptografados; agora é um
+servidor HTTP com Express, Prisma ORM e MySQL, com login por token JWT.
 
-## O problema
+## O que precisa ter instalado
 
-Uma empresa de médio porte troca em média 40% da sua frota de terminais de
-computador a cada dezoito meses. O descarte desses equipamentos gera um passivo
-ambiental e financeiro que a contabilidade tradicional ignora, e a Política
-Nacional de Resíduos Sólidos exige comprovação de destinação — sem
-rastreabilidade, a empresa fica sujeita a multas e restrições operacionais.
+- Node.js 22.9 ou mais novo
+- MySQL 8 rodando na máquina (porta 3306)
+- Insomnia, para testar as rotas (opcional, mas o roteiro abaixo usa ele)
 
-O greencode é o núcleo operacional de uma plataforma que conecta os geradores
-desses resíduos à cadeia de recuperação de valor, registrando cada equipamento
-desde a origem até o destino final.
+Funciona no Windows 10+ e no Ubuntu 24.04.
 
-## O que o sistema faz
+## Como rodar
 
-- Cadastra organizações geradoras com validação de CNPJ e contratos de coleta
-- Registra a chegada de lotes e a triagem de equipamentos
-- Controla o ciclo de vida de cada item por uma máquina de estados auditável
-- Emite o relatório de rastreabilidade completo de qualquer item
-- Mantém um log imutável de todas as transações
+1. Copie o arquivo de exemplo de variáveis de ambiente:
 
-## Instalação
+   ```
+   copy .env.example .env      (Windows)
+   cp .env.example .env        (Ubuntu)
+   ```
 
-Requisitos: **Windows 10 ou superior** e **Node.js 20 ou superior**.
+2. Abra o `.env` e troque `SUA_SENHA` pela senha do root do seu MySQL.
+   O banco `greencode` é criado sozinho, não precisa criar antes.
 
-Para instalar o Node, no PowerShell:
+3. Rode:
 
-```powershell
-winget install OpenJS.NodeJS.LTS
-```
+   ```
+   npm run dev
+   ```
 
-Se o `winget` não estiver disponível, baixe o instalador LTS em
-<https://nodejs.org>. Feche e reabra o PowerShell depois, para que o `PATH` seja
-recarregado, e confira com `node --version` — precisa mostrar `v20` ou superior.
+   Esse comando instala as dependências, gera o Prisma Client, compila,
+   **apaga e recria o banco `greencode`** (aplicando as migrations e o seed com
+   dados de exemplo) e sobe o servidor. Quando aparecer
+   `greencode rodando na porta 3000` está pronto.
 
-Em seguida, na pasta do projeto:
+Para parar o servidor, use Ctrl+C. Para subir de novo **sem** apagar os dados,
+use `npm run iniciar`.
 
-```powershell
-npm install
-npm run compilar
-npm run iniciar
-```
+## Usuários criados pelo seed
 
-Nenhuma biblioteca externa é baixada em tempo de execução: criptografia, leitura
-do terminal e acesso a arquivos vêm dos módulos nativos do Node. As únicas
-dependências são de desenvolvimento — o compilador TypeScript e as definições de
-tipo do Node.
+| Login | Senha | Papel | O que pode fazer |
+|---|---|---|---|
+| admin | admin123 | ADMINISTRADOR | tudo, inclusive usuários e parâmetros |
+| operador | operador123 | OPERADOR_CADASTRO | cadastrar organizações e contratos |
+| gestor | gestor123 | GESTOR_ALMOXARIFADO | lotes, equipamentos, triagem e status |
+| auditor | auditor123 | AUDITOR | só consultar e gerar relatórios |
 
-## Primeira execução
+Todos os papéis podem fazer consultas (`GET`).
 
-Na primeira execução o sistema entra em **modo de provisionamento**: ele detecta
-que não existe chave mestra, gera uma automaticamente e pede que você defina o
-login e a senha do primeiro administrador.
+## Dados de exemplo
 
-```
-------------------------------------------------------------------------
-  PROVISIONAMENTO INICIAL
-------------------------------------------------------------------------
-[AVISO] Chave mestra nao encontrada. O sistema sera configurado agora.
+| Código | Equipamento | Organização | Status | Estado |
+|---|---|---|---|---|
+| GC-COMP-0001 | Dell Optiplex 3080 | 1 - Comercial Alfa | RECEBIDO | - |
+| GC-COMP-0002 | Lenovo ThinkCentre M70 | 1 - Comercial Alfa | TRIADO | BOM |
+| GC-MON-0001 | Samsung S22F350 | 1 - Comercial Alfa | DESMONTE | REGULAR |
+| GC-PER-0001 | Logitech Teclado K120 | 1 - Comercial Alfa | DESCARTADO | SUCATA |
+| GC-COMP-0003 | HP ProDesk 400 | 2 - Hospital Beta | RECICLADO | RUIM |
+| GC-MON-0002 | LG Flatron CRT | 2 - Hospital Beta | RECEBIDO | - |
 
-[SUCESSO] Chave de criptografia AES-256 gerada e gravada em config/master.key
-[AVISO] Sem esse arquivo os dados nao podem ser lidos. Guarde uma copia segura.
+A organização 1 tem contrato; a 2 não tem. O lote 2 entrou há 75 dias, então os
+equipamentos dele já mostram depreciação no rastreio.
 
-Login do administrador: admin
-Senha do administrador (min. 6 caracteres): ******
-Confirme a senha: ******
-```
+## Como testar com o Insomnia
 
-> **Atenção:** perder `config\master.key` significa perder o acesso a todos os
-> dados. Não existe recuperação — é essa a consequência de uma criptografia que
-> funciona.
+1. Rode `npm run dev` (banco limpo).
+2. No Insomnia: **Import** → **From File** → escolha o arquivo `insomnia.json` da raiz do projeto.
+3. Vai aparecer a coleção **greencode** com 7 pastas. Basta clicar em **Send** em
+   cada requisição, de cima para baixo. O login é feito sozinho: cada requisição
+   já usa o token do papel certo.
 
-## Os quatro papéis
+O nome de cada requisição diz o resultado esperado quando é um erro, por exemplo
+`Criar com CNPJ invalido (400)`. O que cada pasta mostra:
 
-O menu principal se adapta automaticamente a quem está logado, escondendo o que
-aquele papel não pode fazer:
+1. **Autenticacao**: login de cada papel e senha errada (401).
+2. **Usuarios**: só o admin gerencia contas; o auditor recebe 403.
+3. **Organizacoes**: validação do CNPJ com dígito verificador, CNPJ repetido (409), contrato 1:1 opcional e versionamento otimista ao atualizar o contrato.
+4. **Lotes**: lote criado junto com os equipamentos numa transação só, código de barras interno gerado pelo sistema, data futura ou com mais de 90 dias recusada.
+5. **Equipamentos**: desmonte sem triagem é recusado, triagem, queda de 2 níveis no estado exige justificativa, mudança de status gravando a movimentação, versão desatualizada (409).
+6. **Relatorios**: rastreio completo de um equipamento (origem, lote, valores e histórico) e resumo de uma organização.
+7. **Configuracoes**: alíquotas e depreciação que o admin pode alterar e que entram no cálculo dos valores.
 
-| Papel | Responsabilidade |
-|---|---|
-| `ADMINISTRADOR` | Contas de acesso e parâmetros globais |
-| `OPERADOR_CADASTRO` | Organizações clientes e contratos de coleta |
-| `GESTOR_ALMOXARIFADO` | Lotes, triagem e movimentação de equipamentos |
-| `AUDITOR` | Consultas e relatórios, sem qualquer alteração |
+Algumas requisições dependem das anteriores (por exemplo, a triagem do
+equipamento 1 vem antes de mover ele para DESMONTE). Se algo sair da ordem, é só
+parar o servidor (Ctrl+C) e rodar `npm run dev` de novo para voltar ao banco inicial.
 
-## Como usar: menu numerado ou comando direto
+A lista completa de rotas está em [docs/API.md](docs/API.md).
 
-Depois do login aparece o menu do papel, com as opções numeradas:
+## Problemas comuns
 
-```
-========================================================================
-  GREENCODE - ALMOXARIFADO
-  gestor | GESTOR_ALMOXARIFADO | sessao expira em 30 min
-========================================================================
-   [1] Registra a chegada de um lote              lote criar
-   [2] Lista os lotes recebidos                   lote listar
-   [3] Mostra o lote e seus equipamentos          lote ver
-   ...
-------------------------------------------------------------------------
-   [0] Encerra a sessao                           sair
-   [?] Mostra este menu novamente                 ajuda
-========================================================================
-```
+- **`EPERM: operation not permitted, rename ... query_engine`** (Windows): o servidor
+  ainda está rodando em outro terminal e trava o arquivo do Prisma. Pare com Ctrl+C e rode de novo.
+- **`Access denied for user 'root'`**: a senha no `.env` está errada.
+- **Ubuntu, root sem senha**: no Ubuntu o root do MySQL entra sem senha pelo `sudo`.
+  Para o Prisma conseguir conectar, defina uma senha:
+  `sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'sua_senha';"`
+- **Porta 3000 ocupada**: troque `PORT` no `.env`.
 
-Digitando **o número**, o sistema pergunta cada dado separadamente e mostra o
-comando equivalente antes de executar — quem está aprendendo o sistema vê a
-forma direta sem precisar decorá-la:
+## Estrutura
 
 ```
-greencode> 1
-
-[INFO] Registra a chegada de um lote:
-  ID da organizacao (ex.: BR001): BR001
-  Numero da nota fiscal: 123456
-  Transportadora: TransRapida
-  Data de entrada AAAA-MM-DD (em branco usa hoje):
-[INFO] Comando equivalente: lote criar --org BR001 --nf 123456 --transp TransRapida
-[SUCESSO] Lote LT001 registrado.
+prisma/schema/        um arquivo .prisma por model e por enum, e as migrations
+src/controllers/      rotas (recebem a requisição e chamam o serviço)
+src/services/         regras de negócio, transações e cálculos
+src/repositories/     consultas ao banco com o Prisma Client
+src/middlewares/      verificação do token JWT e do papel
+src/validadores/      validadores da AV1 (CNPJ, data do lote, status, estado)
+src/tipos/            enums de status e estado físico
+src/seed.ts           dados iniciais
+src/server.ts         sobe o Express, trata os erros e faz o desligamento
 ```
 
-Campo opcional em branco é simplesmente omitido. Campo obrigatório em branco
-cancela a operação, sem gravar nada.
+É o padrão Controller-Service-Repository sugerido na AV2: o controller não fala
+com o banco e o repositório não tem regra de negócio.
 
-Digitando **o comando inteiro** o resultado é o mesmo, e é o caminho mais rápido
-para quem já conhece o sistema. Há autocompletação com `Tab` e o histórico
-persiste entre sessões.
+## Decisões
 
-## Comandos
-
-A convenção é: o primeiro argumento é a ação, os seguintes são identificadores
-ou dados. Opções longas começam com `--`; textos com espaço vão entre aspas.
-
-### Administrador
-
-```
-usuario criar --papel GESTOR_ALMOXARIFADO --login gestor --senha senha123
-usuario listar
-usuario desativar --login gestor
-config ver
-config definir --chave aliquota.icms --valor 17.5
-```
-
-### Operador de cadastro
-
-```
-org criar --razao "Banco Meridional S.A." --cnpj 11.222.333/0001-81
-          --log "Av. Paulista" --num 1500 --cidade "Sao Paulo" --uf SP
-org listar
-org ver BR001
-contrato criar --org BR001 --numero CT-2026-001 --dias 30
-```
-
-### Gestor de almoxarifado
-
-```
-lote criar --org BR001 --nf 123456 --transp TransRapida
-lote ver LT001
-
-equip criar --lote LT001 --tipo COMPUTADOR --marca Dell --modelo OptiPlex7090
-            --proc i5-11500 --memoria 16 --hd sim
-equip criar --lote LT001 --tipo MONITOR --polegadas 24 --tec LCD
-equip criar --lote LT001 --tipo PERIFERICO --subtipo TECLADO
-
-triagem GC-COM-0001 --estado BOM
-equip estado GC-COM-0001 --para RUIM --motivo "placa-mae oxidada"
-mover GC-COM-0001 --para DESMONTE
-```
-
-### Auditor
-
-```
-rastrear GC-COM-0001
-relatorio organizacao BR001
-journal listar --filtro EQUIP --limite 20
-```
-
-## Regras de negócio
-
-O sistema recusa operações que violem qualquer uma destas regras, sempre com
-mensagem explicando o motivo:
-
-| Regra | O que impede |
-|---|---|
-| RN-01 | CNPJ inválido ou já cadastrado |
-| RN-02 | Lote com data futura ou anterior a 90 dias |
-| RN-03 | Desmonte sem triagem completa; movimentação a partir de status final |
-| RN-04 | Queda de duas categorias de estado físico sem justificativa |
-| RN-05 | Comando após 30 minutos de sessão inativa |
-| RN-06 | Comando fora das permissões do papel |
-| RN-07 | Journal maior que 10 MB ou mais antigo que 180 dias |
-
-As mensagens exatas de cada recusa estão em
-[docs/FAILURE-SCENARIOS.md](docs/FAILURE-SCENARIOS.md).
-
-## Testes
-
-```powershell
-npm run testar
-```
-
-Para ver o sistema inteiro funcionando de ponta a ponta, do provisionamento até
-a rastreabilidade após múltiplas movimentações:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\jornada-completa.ps1
-```
-
-O PowerShell bloqueia scripts `.ps1` por padrão; o `-ExecutionPolicy Bypass`
-libera apenas aquela execução, sem alterar a configuração da máquina.
-
-O script apaga os dados existentes, recompila e executa nove etapas, incluindo
-os cenários de falha: CNPJ inválido, data fora da janela, desmonte sem triagem,
-queda de estado sem justificativa e auditor tentando alterar dados.
-
-## Documentação
-
-| Documento | Conteúdo |
-|---|---|
-| [docs/SECURITY.md](docs/SECURITY.md) | Criptografia, hashing, sessões e limitações conhecidas |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Camadas, decisões técnicas e caminho para as próximas etapas |
-| [docs/FAILURE-SCENARIOS.md](docs/FAILURE-SCENARIOS.md) | Cenários de falha testados e respostas do sistema |
-
-## Estrutura do projeto
-
-```
-greencode/
-├── src/
-│   ├── tipos/          Enumerações: estado físico, status, severidade
-│   ├── classes/        Domínio: usuários, organizações, lotes, equipamentos
-│   ├── validadores/    Regras de negócio, uma classe por regra
-│   ├── fabricas/       Criação de objetos compostos
-│   ├── repositorios/   Persistência cifrada em arquivo
-│   ├── servicos/       Criptografia, journal, autenticação, rastreabilidade
-│   ├── cli/            Menus, interpretador de comandos, mensagens
-│   ├── util/           Caminhos de arquivo e identificadores
-│   └── testes/         Testes unitários
-├── docs/               Documentação
-├── scripts/            Jornada de teste e limpeza
-├── config/             Chave mestra (gerada, nunca versionada)
-├── data/               Dados cifrados (gerados, nunca versionados)
-└── logs/               Journal e histórico da CLI (gerados)
-```
-
-## Licença
-
-MIT.
+- **Express em vez de Fastify**: a AV2 aceita os dois; usei o Express por já
+  conhecer e por ser mais simples para o tamanho do projeto.
+- **MySQL em vez de PostgreSQL**: é o banco usado nas aulas e nos exemplos.
+  As restrições que importam (CNPJ e código de barras únicos, CHECK de triagem e de datas do contrato) funcionam no MySQL 8.
+- **JWT com validade de 30 minutos**: substitui a sessão da AV1 (que expirava em 30 min de inatividade).
+  Diferença: o token expira 30 min depois do login, não depois da última ação.
+- **bcrypt em vez de SHA-256**: SHA-256 sem salt é rápido demais para guardar senha;
+  o bcrypt é lento de propósito e já coloca um salt em cada hash.
+- **Transações**: criar lote com equipamentos, e mudar status do equipamento junto com
+  o registro da movimentação. Se uma parte falha, nada é gravado.
+- **Versionamento otimista**: os models que podem ser alterados têm o campo `versao`.
+  Quem altera manda a versão que leu; se outra pessoa alterou antes, a API responde 409.
+- **Uma tabela só para equipamentos**: o Prisma não tem herança, então computador,
+  monitor e periférico ficaram na mesma tabela com o campo `tipo`.
+- **Cálculo financeiro**: valor atual = valor de entrada menos a depreciação mensal
+  desde a chegada do lote; impostos = ICMS + ISS sobre o valor atual.
