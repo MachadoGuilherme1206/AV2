@@ -42,7 +42,7 @@ use `npm run iniciar`.
 
 | Login | Senha | Papel | O que pode fazer |
 |---|---|---|---|
-| admin | admin123 | ADMINISTRADOR | tudo, inclusive usuários e parâmetros |
+| admin | viuvanegra | ADMINISTRADOR | tudo, inclusive usuários e parâmetros |
 | operador | operador123 | OPERADOR_CADASTRO | cadastrar organizações e contratos |
 | gestor | gestor123 | GESTOR_ALMOXARIFADO | lotes, equipamentos, triagem e status |
 | auditor | auditor123 | AUDITOR | só consultar e gerar relatórios |
